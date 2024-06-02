@@ -6,14 +6,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl python3-pip
 
 RUN pip3 install --upgrade pip
-RUN pip3 install torch==2.1.0 torchvision==0.16.0 --index-url https://download.pytorch.org/whl/cu118
-RUN pip3 install xformers==0.0.22.post4 --index-url https://download.pytorch.org/whl/cu118
+RUN pip3 install torch==2.1.0 torchvision==0.16.0 --index-url https://pypi.mirrors.ustc.edu.cn/simple
+RUN pip3 install xformers==0.0.22.post4 --index-url https://pypi.mirrors.ustc.edu.cn/simple
 
-ARG version 
+# 设置工作目录
+WORKDIR /iopaint
 
-RUN pip3 install lama-cleaner==$version
-RUN lama-cleaner --install-plugins-package
+COPY ./requirements.txt /iopaint/requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir --upgrade -r /iopaint/requirements.txt -i https://pypi.mirrors.ustc.edu.cn/simple
 
-EXPOSE 8080
+COPY ./iopaint /iopaint
 
-CMD ["bash"]
+EXPOSE 20700
+
+CMD ["bash" "/iopaint/run.sh"]
